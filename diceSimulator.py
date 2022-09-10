@@ -1,14 +1,21 @@
-import math
+import math, time, sys, argparse
 import matplotlib.pyplot as plt
 import itertools
-import time
-import sys
 
+def main(sides, quantity):
 
-def main():
-    # set parameters
-    sides = 6
-    quantity = 10
+    # Check paramters are present and convert into integers
+    if (sides):
+        sides = int(sides)
+    else:
+        print("No parameter specified for sides. Quitting...")
+        sys.exit()
+
+    if (quantity):
+        quantity = int(quantity)
+    else:
+        print("No parameter specified for quantity. Quitting...")
+        sys.exit()
 
     # We'll time how long it takes to execute, so start a timer
     startTime = time.time()
@@ -61,4 +68,14 @@ def main():
     plt.show()
 
 if __name__ == '__main__':
-    main()
+    
+    # parse parameters from command line
+    parser=argparse.ArgumentParser()
+
+    # configure command line parameters
+    parser.add_argument("--sides", help="How many sides the die has")
+    parser.add_argument("--quantity", help="How many dice you wish to roll")
+    args=parser.parse_args()
+
+    main(args.sides, args.quantity)
+    
