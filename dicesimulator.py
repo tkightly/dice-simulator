@@ -11,7 +11,8 @@ import matplotlib.pyplot as plt
 def main(sides, quantity):
 
     """
-    a simple function to calculate the probability of getting a particular dice sum when for xdy, where x is the quantity of dice to be rolled and y is the number of sides.
+    a simple function to calculate the probability of getting a particular dice sum when for
+    xdy, where x is the quantity of dice to be rolled and y is the number of sides.
     """
 
     # Check paramters are present and convert into integers
@@ -30,7 +31,7 @@ def main(sides, quantity):
     # We'll time how long it takes to execute, so start a timer
     start_time = time.time()
 
-    print("Rolling %sd%s" % (quantity, sides))
+    print(f"Rolling {sides}d{quantity}")
 
     # Use the itertools module to get all possible combinations of the rolls
     combinations = list(itertools.product(range(sides), repeat=quantity))
@@ -56,7 +57,7 @@ def main(sides, quantity):
     i = 0
     for desired_outcome in range(quantity, (sides * quantity + 1)):
         i += 1
-        print("Working on outcome %s of %s" % (i, sides * quantity + 1 - quantity))
+        print(f"Working on outcome {i} of {sides * quantity + 1 - quantity}")
         incidents = 0
         report_outcome.append(desired_outcome)
 
