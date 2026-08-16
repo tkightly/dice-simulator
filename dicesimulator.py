@@ -5,7 +5,6 @@ dicesimulator.py
 import time
 import sys
 import argparse
-import itertools
 import matplotlib.pyplot as plt
 
 def main(sides, quantity):
@@ -31,43 +30,39 @@ def main(sides, quantity):
     # We'll time how long it takes to execute, so start a timer
     start_time = time.time()
 
-    print(f"Rolling {sides}d{quantity}")
+    print(f"Rolling {quantity}d{sides}")
 
-    # Use the itertools module to get all possible combinations of the rolls
-    combinations = list(itertools.product(range(sides), repeat=quantity))
+    # Build up the distribution of the running total one die at a time, instead of
+    # enumerating every one of the sides**quantity possible dice combinations.
+    #
+    # counts[k] holds the number of ways to reach a running total of k using the dice
+    # rolled so far. Rolling one more die convolves counts with the single-die
+    # distribution (each existing total can be extended by any of the die's faces).
+    # This keeps the work polynomial in sides * quantity rather than exponential in
+    # quantity.
 
-    # This will be used to store the calculated total of each combination
-    outcomes_list = []
+    # After 1 die, each face 1..sides has exactly one way to occur.
+    counts = [0] + [1] * sides  # index 0 unused, indices 1..sides = 1 way each
+
+    for die in range(2, quantity + 1):
+        print(f"Adding die {die} of {quantity}")
+        max_total = die * sides
+        new_counts = [0] * (max_total + 1)
+
+        for prev_total in range(die - 1, (die - 1) * sides + 1):
+            ways = counts[prev_total]
+            if ways == 0:
+                continue
+            for face in range(1, sides + 1):
+                new_counts[prev_total + face] += ways
+
+        counts = new_counts
+
+    total_combinations = sides ** quantity
 
     # These are used to store the values for the X and Y axix
-    report_outcome = []
-    report_probability = []
-
-    # Loop through each possible combination, work out the sum and append to sum_outcome
-    for outcome in combinations:
-        sum_outcome = 0
-
-        for value in outcome:
-            sum_outcome = sum_outcome + value + 1
-
-        outcomes_list.append(sum_outcome)
-
-    # desired_outcome is each possible roll. Loop through each and count how many times that roll
-    # occurs, work out the probability, then append it to the Y axis
-    i = 0
-    for desired_outcome in range(quantity, (sides * quantity + 1)):
-        i += 1
-        print(f"Working on outcome {i} of {sides * quantity + 1 - quantity}")
-        incidents = 0
-        report_outcome.append(desired_outcome)
-
-        for outcome in outcomes_list:
-            if desired_outcome == outcome:
-                incidents += 1
-
-        probability = incidents/(len(combinations))
-
-        report_probability.append(probability)
+    report_outcome = list(range(quantity, sides * quantity + 1))
+    report_probability = [counts[outcome] / total_combinations for outcome in report_outcome]
 
     print("Execution took ", round(time.time() - start_time, 2), "seconds")
 
